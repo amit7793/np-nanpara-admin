@@ -1,0 +1,123 @@
+
+.main-content.shifted {
+    margin-left: 16rem;
+  }
+  @media screen and (max-width: 1024px) {
+    .main-content.shifted {
+      margin-left: 0;
+    }
+   input{
+    height: 50px !important;
+   }
+
+  }
+  @media screen and (max-width: 425px) {
+    .popup {
+      height:800px;
+    }
+   input{
+    height: 50px !important;
+   }
+  input[type='radio']{
+  width:22px !important;
+
+  }
+  }
+  .box-shadow{
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  }
+  .shade{
+    box-shadow: -10px 10px 20px 0px #0000000D;
+
+  }
+  .content{
+  z-index: 50 !important;
+  }
+  /* Select option styles */
+  .select-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 60px;
+  cursor: pointer;
+  }
+
+  .select-option:after {
+  content: '';
+  border-top: 9px solid #000;
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  margin-top: -6px;
+  transition: transform 0.3s ease;
+  }
+
+  /* Rounded corners for inputs */
+  .select-option input {
+  border: none;
+  outline: none;
+  width: 100%;
+  border-radius: 60px;
+  }
+
+  .select-box {
+  position: relative;
+  }
+
+  .select-box .content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0 0 30px 30px;
+  z-index: 1;
+  }
+
+  .select-box.active .content {
+  display: block;
+  }
+
+  .select-box.active .select-option {
+  border-radius: 30px 30px 0 0;
+  }
+
+  .select-box.active .select-option:after {
+  transform: rotate(180deg);
+  }
+
+  /* Option list styles */
+  .options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  }
+
+  .options li {
+  padding: 10px;
+  cursor: pointer;
+  }
+
+  .options li:hover {
+  background-color: #f0f0f0;
+  }
+
+  input[type='radio']{
+  width:36px;
+  height: 36px;
+  border:2px solid #000000
+  }
+  input[type='checkbox']{
+  width:25px;
+  height: 25px;
+  border:2px solid #B1B6C6
+  }
+  ::-webkit-scrollbar{
+  display: none;
+  }
