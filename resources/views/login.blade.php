@@ -8,10 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
     <link rel="stylesheet" href="{{ asset('admin-assets/css/style.css') }}">
-    {{-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet"> --}}
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet">
-
-
     <style>
         .swiper-slide {
             position: relative;
@@ -54,7 +51,7 @@
         <div class="flex justify-center lg:mx-auto pt-[40px] pb-[20px] lg:pb-[200px]">
             <div class="lg:w-[600px] w-full border border-[#00000033] rounded-[20px] p-5 shade">
                 <div class="flex justify-center">
-                    <img src="{{ asset('admin-assets/images/nanpa.svg') }}" style="width: 80%;"/>
+                    <img src="{{ asset('admin-assets/images/nanpa.svg') }}" style="width: 80%;" />
                 </div>
                 <div class="mt-10">
                     <h1 class="font-bold text-[34px] leading-[42px] text-[#000000] text-center">Login</h1>
@@ -64,7 +61,7 @@
 
                 <form class="mt-5" action="{{ route('login') }}" method="POST" autocomplete="off">
                     @csrf
-                    <div>
+                    {{-- <div>
                         <label class="font-normal text-[15px] leading-[18px] text-[#000000]">Email Address</label>
                         <input type="email" name="email" placeholder="Enter Email Address" autocomplete="off"
                             class="w-full h-[60px] border border-[#B1B6C6] outline-none rounded-[16px] pl-[19px] mt-1"
@@ -78,6 +75,32 @@
                             placeholder="Enter password" required>
                         <img id="togglePassword" src="{{ asset('admin-assets/images/EYE.svg') }}"
                             class="absolute right-[16px] bottom-[18px]" />
+                    </div> --}}
+                    <div>
+                        <label class="font-normal text-[15px] leading-[18px] text-[#000000]">Email Address</label>
+                        <input type="hidden" name="encrypt_email" class="encrypt_email" readonly>
+                        <input type="hidden" name="encrypt_data_iv" class="encrypt_data_iv" readonly>
+                        <input type="email" placeholder="Enter Email Address" autocomplete="off"
+                            class="email w-full h-[60px] border border-[#B1B6C6] outline-none rounded-[16px] pl-[19px] mt-1"
+                            required>
+                        @error('encrypt_email')
+                            <span class="text-danger">{{ $errors->first('encrypt_email') }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="mt-4 relative">
+                        <label class="font-normal text-[15px] leading-[18px] text-[#000000]">Password</label>
+                        <input type="hidden" name="encrypt_password" class="encrypt_password" readonly>
+                        <input type="hidden" name="encrypt_data_iv" class="encrypt_data_iv" readonly>
+                        <input type="password" id="password" autocomplete="off"
+                            class="password w-full h-[60px] border border-[#B1B6C6] outline-none rounded-[16px] pl-[19px] mt-1"
+                            placeholder="Enter password" required>
+                        <img id="togglePassword" src="{{ asset('admin-assets/images/EYE.svg') }}"
+                            class="absolute right-[16px] bottom-[18px]" />
+
+                        @error('encrypt_password')
+                            <span class="text-danger">{{ $errors->first('encrypt_password') }}</span>
+                        @enderror
                     </div>
 
                     <!-- Captcha -->
@@ -113,6 +136,37 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+
+    <script>
+        function encryptFunction(data) {
+            const key = CryptoJS.enc.Utf8.parse('1234567890123456');
+            const iv = CryptoJS.enc.Utf8.parse('1234567890123456');
+            const encrypted = CryptoJS.AES.encrypt(data, key, {
+                iv: iv
+            }).toString();
+            const encryptedData = {
+                data: encrypted,
+                iv: iv.toString(CryptoJS.enc.Hex)
+            };
+            return encryptedData;
+        }
+
+        function encryptData(inputElement, encryptedInputSelector, ivInputSelector) {
+            var inputValue = $(inputElement).val();
+            var encryptedResult = encryptFunction(inputValue);
+            $(encryptedInputSelector).val(encryptedResult.data);
+            $(ivInputSelector).val(encryptedResult.iv);
+        }
+
+        $('.email').on('keyup', function() {
+            encryptData(this, '.encrypt_email', '.encrypt_data_iv');
+        });
+        $('.password').on('keyup', function() {
+            encryptData(this, '.encrypt_password', '.encrypt_data_iv');
+        });
+    </script>
+
     <script>
         function refreshCaptcha() {
             $.ajax({

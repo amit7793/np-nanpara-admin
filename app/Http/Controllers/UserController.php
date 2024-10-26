@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use phpseclib3\Crypt\AES;
 
 class UserController extends Controller
 {
@@ -44,20 +46,45 @@ class UserController extends Controller
         return $captcha;
     }
 
+    public function decryptFunction($encryptedData, $ivHex)
+    {
+        $key = '1234567890123456';
+        $decodedData = base64_decode($encryptedData);
+        $iv = hex2bin($ivHex); // Convert hex IV back to binary
+        $aes = new AES('cbc');
+        $aes->setKey($key);
+        $aes->setIV($iv);
+        $decryptedData = $aes->decrypt($decodedData);
+        return $decryptedData;
+    }
+
     public function login(Request $request)
     {
         try {
 
+            $validator = Validator::make($request->all(), [
+                'encrypt_email' => 'required',
+                'encrypt_password' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
             if ($request->captcha_input !== session('captcha')) {
                 return redirect()->back()->with('error', 'Captcha is incorrect.');
             }
 
+            $formData = $request->all();
+            $encryptedDataiv = $request->encrypt_data_iv;
+            $encrypt_email = $request->encrypt_email;
+            $encrypt_password = $request->encrypt_password;
+            $email    = $this->decryptFunction($encrypt_email, $encryptedDataiv);
+            $password = $this->decryptFunction($encrypt_password, $encryptedDataiv);
 
-            $credentials = $request->only('email', 'password');
-            $Role = User::where('email', $request->email)->where('role', '1')->first();
+            $Role = User::where('email', $email)->where('role', '1')->first();
 
             if ($Role) {
-                if (Auth::attempt($credentials)) {
+                    Auth::login($Role);
                     $newToken = Str::random(60);
                     Auth::user()->forceFill([
                         'session_id' => $newToken,
@@ -69,14 +96,12 @@ class UserController extends Controller
                         'name' => Auth::user()->name,
                         'email' => Auth::user()->email,
                         'phone_number' => Auth::user()->mobile,
-                        'logged_in_at' => Carbon::now(),
+                        'logged_in_at' => Carbon::now()
                     ]);
 
                     session()->forget('captcha');
                     return redirect()->route('admin.dashboard')->with('success', 'Admin successfully logged in');
-                } else {
-                    return redirect()->route('login.page')->with('error', 'These credentials do not match our records.');
-                }
+
             } else {
                 return redirect()->route('login.page')->with('error', 'These credentials do not match our records.');
             }
