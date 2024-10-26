@@ -50,7 +50,7 @@ class UserController extends Controller
     {
         $key = '1234567890123456';
         $decodedData = base64_decode($encryptedData);
-        $iv = hex2bin($ivHex); // Convert hex IV back to binary
+        $iv = hex2bin($ivHex);
         $aes = new AES('cbc');
         $aes->setKey($key);
         $aes->setIV($iv);
